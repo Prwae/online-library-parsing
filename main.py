@@ -57,6 +57,10 @@ def webpage_parsing(response):
     title_tag = soup.find("h1")
     image_tag = soup.find("div", class_="bookimage").find("img")["src"]
     comments_tag_list = soup.find_all("div", class_="texts")
+    genre_tags = soup.find("span", class_="d_book").find_all("a")
+
+    genres_list = [genre_tag.text for genre_tag in genre_tags]
+
     comments_list = [comment_tag.find("span").text for comment_tag in comments_tag_list]
 
     image_extension = os.path.splitext(image_tag)
@@ -68,7 +72,7 @@ def webpage_parsing(response):
     title = splitted_title[0].strip()
     author = splitted_title[1].strip()
 
-    return title, author, image_url, image_extension[1], comments_list
+    return title, author, image_url, image_extension[1], comments_list, genres_list
 
 
 if __name__ == "__main__":
@@ -79,7 +83,7 @@ if __name__ == "__main__":
         response.raise_for_status()
         try:
             check_for_redirect(response)
-            title, author, image_url, image_extension, comments_list = webpage_parsing(response)
+            title, author, image_url, image_extension, comments_list, genres_list = webpage_parsing(response)
             download_txt(book_id, f"{book_id}. {title}")
             download_image(image_url, f"{book_id}{image_extension}")
         except ErrRedirection:
