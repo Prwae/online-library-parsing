@@ -1,11 +1,13 @@
 import logging
-import requests
 import os
-from bs4 import BeautifulSoup
-import lxml
-from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
 import argparse
+
+import requests
+from bs4 import BeautifulSoup
+from pathvalidate import sanitize_filename
+import lxml
+
 
 TULULU_BASE_URL = "https://tululu.org/"
 
@@ -22,7 +24,7 @@ def check_for_redirect(response):
 def download_txt(book_id, filename, folder='books/'):
     txt_url = urljoin(TULULU_BASE_URL, "txt.php")
     payload = {
-        "id":book_id
+        "id": book_id
     }
 
     response = requests.get(txt_url, params=payload)
