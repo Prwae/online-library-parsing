@@ -52,7 +52,7 @@ def download_image(image_url, filename, folder='images/'):
     return image_path
 
 
-def webpage_parsing(response):
+def parse_book_page(response):
     soup = BeautifulSoup(response.text, "lxml")
     title_tag = soup.find("h1")
     image_tag = soup.find("div", class_="bookimage").find("img")["src"]
@@ -63,7 +63,7 @@ def webpage_parsing(response):
 
     comments_list = [comment_tag.find("span").text for comment_tag in comments_tag_list]
 
-    image_extension = os.path.splitext(image_tag)
+    image_extension = os.path.splitext(image_tag)[1]
     image_url = urljoin(TULULU_BASE_URL, image_tag)
 
     title_text = title_tag.text
@@ -72,7 +72,16 @@ def webpage_parsing(response):
     title = splitted_title[0].strip()
     author = splitted_title[1].strip()
 
-    return title, author, image_url, image_extension[1], comments_list, genres_list
+    book_params = {
+        "title": title,
+        "author": author,
+        "image_url": image_url,
+        "image_extension": image_extension,
+        "comments_list": comments_list,
+        "genres_list": genres_list
+    }
+
+    return book_params
 
 
 if __name__ == "__main__":
@@ -83,8 +92,8 @@ if __name__ == "__main__":
         response.raise_for_status()
         try:
             check_for_redirect(response)
-            title, author, image_url, image_extension, comments_list, genres_list = webpage_parsing(response)
-            download_txt(book_id, f"{book_id}. {title}")
-            download_image(image_url, f"{book_id}{image_extension}")
+            book_params = parse_book_page(response)
+            download_txt(book_id, f"{book_id}. {book_params['title']}")
+            download_image(book_params["image_url"], f"{book_id}{book_params['image_extension']}")
         except ErrRedirection:
             logging.warning("Было перенаправление")
