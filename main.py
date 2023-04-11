@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import lxml
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
-
+import argparse
 
 TULULU_BASE_URL = "https://tululu.org/"
 
@@ -85,7 +85,14 @@ def parse_book_page(response):
 
 
 if __name__ == "__main__":
-    for book_id in range(1, 10):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--start_id", help="С какого id книги начать парсинг библиотеки", type=int, default=1)
+    parser.add_argument("--end_id", help="На каком id книги закончить парсинг библиотеки", type=int, default=10)
+    args = parser.parse_args()
+    start_id = args.start_id
+    end_id = args.end_id
+
+    for book_id in range(start_id, end_id):
         book_url = urljoin(TULULU_BASE_URL, f'b{book_id}')
 
         response = requests.get(book_url)
@@ -93,7 +100,11 @@ if __name__ == "__main__":
         try:
             check_for_redirect(response)
             book_params = parse_book_page(response)
+
+            print(f"Название: {book_params['title']} \nАвтор: {book_params['author']}\n")
+
             download_txt(book_id, f"{book_id}. {book_params['title']}")
             download_image(book_params["image_url"], f"{book_id}{book_params['image_extension']}")
         except ErrRedirection:
             logging.warning("Было перенаправление")
+
