@@ -66,7 +66,7 @@ def parse_book_page(response):
     comments = [comment_tag.find("span").text for comment_tag in comments_tags]
 
     image_extension = os.path.splitext(image_tag)[1]
-    image_url = urljoin(TULULU_BASE_URL, image_tag)
+    image_url = urljoin(response.url, image_tag)
 
     title_text = title_tag.text
     splitted_title = title_text.strip().split("::")
