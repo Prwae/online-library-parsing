@@ -58,12 +58,12 @@ def parse_book_page(response):
     soup = BeautifulSoup(response.text, "lxml")
     title_tag = soup.find("h1")
     image_tag = soup.find("div", class_="bookimage").find("img")["src"]
-    comments_tag_list = soup.find_all("div", class_="texts")
+    comments_tags = soup.find_all("div", class_="texts")
     genre_tags = soup.find("span", class_="d_book").find_all("a")
 
-    genres_list = [genre_tag.text for genre_tag in genre_tags]
+    genres = [genre_tag.text for genre_tag in genre_tags]
 
-    comments_list = [comment_tag.find("span").text for comment_tag in comments_tag_list]
+    comments = [comment_tag.find("span").text for comment_tag in comments_tags]
 
     image_extension = os.path.splitext(image_tag)[1]
     image_url = urljoin(TULULU_BASE_URL, image_tag)
@@ -79,8 +79,8 @@ def parse_book_page(response):
         "author": author,
         "image_url": image_url,
         "image_extension": image_extension,
-        "comments_list": comments_list,
-        "genres_list": genres_list
+        "comments": comments,
+        "genres": genres
     }
 
     return book_params
