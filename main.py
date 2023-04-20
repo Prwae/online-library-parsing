@@ -1,13 +1,11 @@
+import argparse
 import logging
 import os
 from urllib.parse import urljoin
-import argparse
 
 import requests
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
-import lxml
-
 
 TULULU_BASE_URL = "https://tululu.org/"
 
