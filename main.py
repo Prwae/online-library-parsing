@@ -40,7 +40,7 @@ def download_txt(book_id, filename, folder='books/'):
     return book_path
 
 
-def download_image(image_url, filename, folder='images/'):
+def download_image(image_url, filename, folder="images/"):
     response = requests.get(image_url)
     response.raise_for_status()
 
