@@ -21,7 +21,7 @@ def check_for_redirect(response):
         raise ErrRedirection
 
 
-def download_txt(book_id, filename, folder='books/'):
+def download_txt(book_id, filename, folder="books/"):
     txt_url = urljoin(TULULU_BASE_URL, "txt.php")
     payload = {
         "id": book_id
