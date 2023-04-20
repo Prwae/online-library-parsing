@@ -69,14 +69,11 @@ def parse_book_page(response):
     image_url = urljoin(response.url, image_tag)
 
     title_text = title_tag.text
-    splitted_title = title_text.strip().split("::")
-
-    title = splitted_title[0].strip()
-    author = splitted_title[1].strip()
+    title, author = title_text.strip().split("::")
 
     book_params = {
-        "title": title,
-        "author": author,
+        "title": title.strip(),
+        "author": author.strip(),
         "image_url": image_url,
         "image_extension": image_extension,
         "comments": comments,
