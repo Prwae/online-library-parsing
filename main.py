@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import time
 from urllib.parse import urljoin
 
 import requests
@@ -104,4 +105,9 @@ if __name__ == "__main__":
             download_image(book_params["image_url"], f"{book_id}{book_params['image_extension']}")
         except ErrRedirection:
             logging.warning("Было перенаправление")
+        except requests.exceptions.HTTPError:
+            logging.warning("Произошла ошибка при обработке страницы")
+        except requests.exceptions.ConnectionError:
+            logging.warning("Произошла ошибка соединения")
+            time.sleep(10)
 
