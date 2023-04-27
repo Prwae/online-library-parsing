@@ -93,9 +93,9 @@ if __name__ == "__main__":
     for book_id in range(start_id, end_id):
         book_url = urljoin(TULULU_BASE_URL, f'b{book_id}')
 
-        response = requests.get(book_url)
-        response.raise_for_status()
         try:
+            response = requests.get(book_url)
+            response.raise_for_status()
             check_for_redirect(response)
             book_params = parse_book_page(response)
 
