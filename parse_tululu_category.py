@@ -89,9 +89,16 @@ def parse_book_page(response):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--start_page", help="С какой страницы сайта начать парсинг библиотеки", type=int, default=1)
+    parser.add_argument("--end_page", help="На какой странице сайта закончить парсинг библиотеки", type=int, default=701)
+    args = parser.parse_args()
+    start_page = args.start_page
+    end_page = args.end_page
+
     books_params = []
 
-    for page_num in range(1, 2):
+    for page_num in range(start_page, end_page):
         response = requests.get(urljoin("https://tululu.org/l55/", str(page_num)))
         response.raise_for_status()
 
