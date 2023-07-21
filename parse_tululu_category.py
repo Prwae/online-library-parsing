@@ -53,14 +53,22 @@ def parse_book_paths(response):
 
 def parse_book_page(response):
     soup = BeautifulSoup(response.text, "lxml")
-    title_tag = soup.find("h1")
-    image_tag = soup.find("div", class_="bookimage").find("img")["src"]
-    comments_tags = soup.find_all("div", class_="texts")
-    genre_tags = soup.find("span", class_="d_book").find_all("a")
+
+    title_tag_selector = "h1"
+    image_tag_selector = "div.bookimage img"
+    comments_tags_selector = "div.texts"
+    genre_tags_selector = "span.d_book a"
+    comment_text_selector = "span.black"
+
+
+    title_tag = soup.select_one(title_tag_selector)
+    image_tag = soup.select_one(image_tag_selector)["src"]
+    comments_tags = soup.select(comments_tags_selector)
+    genre_tags = soup.select(genre_tags_selector)
 
     genres = [genre_tag.text for genre_tag in genre_tags]
 
-    comments = [comment_tag.find("span").text for comment_tag in comments_tags]
+    comments = [comment_tag.select(comment_text_selector)[0].text for comment_tag in comments_tags]
 
     image_extension = os.path.splitext(image_tag)[1]
     image_url = urljoin(response.url, image_tag)
@@ -83,7 +91,7 @@ def parse_book_page(response):
 if __name__ == "__main__":
     books_params = []
 
-    for page_num in range(1, 4):
+    for page_num in range(1, 2):
         response = requests.get(urljoin("https://tululu.org/l55/", str(page_num)))
         response.raise_for_status()
 
