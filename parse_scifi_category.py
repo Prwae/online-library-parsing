@@ -94,7 +94,7 @@ if __name__ == "__main__":
     parser.add_argument("--end_page", help="На какой странице сайта закончить парсинг библиотеки", type=int, default=701)
     parser.add_argument("--skip_imgs", action="store_true", help="При вызове, обложки скачиваться не будут")
     parser.add_argument("--skip_txt", action="store_true", help="При вызове, тексты книг скачиваться не будут")
-    parser.add_argument("--dest_folder", help="Папка с результатами парсинга, по умолчанию - корневая папка проекта", type=str, default="results/")
+    parser.add_argument("--dest_folder", help="Папка с результатами парсинга, по умолчанию - results", type=str, default="results/")
     args = parser.parse_args()
     start_page = args.start_page
     end_page = args.end_page
