@@ -92,9 +92,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--start_page", help="С какой страницы сайта начать парсинг библиотеки", type=int, default=1)
     parser.add_argument("--end_page", help="На какой странице сайта закончить парсинг библиотеки", type=int, default=701)
+    parser.add_argument("--skip_imgs", action="store_true", help="При вызове, обложки скачиваться не будут")
+    parser.add_argument("--skip_txt", action="store_true", help="При вызове, тексты книг скачиваться не будут")
+    parser.add_argument("--dest_folder", help="Папка с результатами парсинга, по умолчанию - корневая папка проекта", type=str, default="results/")
     args = parser.parse_args()
     start_page = args.start_page
     end_page = args.end_page
+    is_imgs_skip = args.skip_imgs
+    is_txt_skip = args.skip_txt
+    dest_folder = args.dest_folder
 
     books_params = []
 
@@ -119,8 +125,15 @@ if __name__ == "__main__":
 
                 print(f"Название: {title} \nАвтор: {author}\n")
 
-                book_path = download_txt(book_id, f"{book_id}. {title}")
-                image_path = download_image(image_url, f"{book_id}{image_extencion}")
+                if is_txt_skip:
+                    book_path = "-"
+                else:
+                    book_path = download_txt(book_id, f"{book_id}. {title}", urljoin(dest_folder, "books/"))
+
+                if is_imgs_skip:
+                    image_path = "-"
+                else:
+                    image_path = download_image(image_url, f"{book_id}{image_extencion}", urljoin(dest_folder, "images/"))
 
                 books_params.append(
                     {
@@ -137,5 +150,5 @@ if __name__ == "__main__":
                 logging.warning("Произошла ошибка соединения")
                 time.sleep(10)
     books_params_json = json.dumps(books_params, ensure_ascii=False)
-    with open("books_params.json", "w", encoding="utf-8") as my_file:
+    with open(urljoin(dest_folder, "books_params.json"), "w", encoding="utf-8") as my_file:
         my_file.write(books_params_json)
