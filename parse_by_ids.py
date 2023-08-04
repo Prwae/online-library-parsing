@@ -84,7 +84,7 @@ def parse_book_page(response):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Программа парсит книги по их ID на сайте Tululu.org")
     parser.add_argument("--start_id", help="С какого id книги начать парсинг библиотеки", type=int, default=1)
     parser.add_argument("--end_id", help="На каком id книги закончить парсинг библиотеки", type=int, default=10)
     parser.add_argument("--skip_imgs", action="store_true", help="При вызове, обложки скачиваться не будут")
