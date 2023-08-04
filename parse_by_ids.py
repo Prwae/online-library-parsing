@@ -68,5 +68,5 @@ if __name__ == "__main__":
         except requests.exceptions.ConnectionError:
             logging.warning("Произошла ошибка соединения")
             time.sleep(10)
-    with open(urljoin(dest_folder, "books_params.json"), "w", encoding="utf-8") as my_file:
-        json.dump(book_params, my_file, ensure_ascii=False)
+    with open(urljoin(dest_folder, "books_params.json"), "w", encoding="utf-8") as file:
+        json.dump(book_params, file, ensure_ascii=False)
