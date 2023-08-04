@@ -13,6 +13,15 @@ from pathvalidate import sanitize_filename
 TULULU_BASE_URL = "https://tululu.org/"
 
 
+class ErrRedirection(Exception):
+    pass
+
+
+def check_for_redirect(response):
+    if response.url == "https://tululu.org/":
+        raise ErrRedirection
+
+
 def download_txt(book_id, filename, folder="books/"):
     txt_url = urljoin(TULULU_BASE_URL, "txt.php")
     payload = {
@@ -108,6 +117,7 @@ if __name__ == "__main__":
         try:
             response = requests.get(urljoin("https://tululu.org/l55/", str(page_num)))
             response.raise_for_status()
+            check_for_redirect(response)
 
             for book_path in parse_book_paths(response):
                 book_url = urljoin(TULULU_BASE_URL, f'{book_path}')
@@ -115,6 +125,7 @@ if __name__ == "__main__":
                 try:
                     response = requests.get(book_url)
                     response.raise_for_status()
+                    check_for_redirect(response)
                     book_params = parse_book_page(response)
 
                     title = book_params["title"]
@@ -145,11 +156,15 @@ if __name__ == "__main__":
                             "comments": comments,
                             "genres": genres
                         })
+                except ErrRedirection:
+                    logging.warning("Было перенаправление")
                 except requests.exceptions.HTTPError:
                     logging.warning("Произошла ошибка при обработке страницы")
                 except requests.exceptions.ConnectionError:
                     logging.warning("Произошла ошибка соединения")
                     time.sleep(10)
+        except ErrRedirection:
+            logging.warning("Было перенаправление")
         except requests.exceptions.HTTPError:
             logging.warning("Произошла ошибка при обработке страницы")
         except requests.exceptions.ConnectionError:
