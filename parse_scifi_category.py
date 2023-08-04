@@ -105,50 +105,56 @@ if __name__ == "__main__":
     books_params = []
 
     for page_num in range(start_page, end_page):
-        response = requests.get(urljoin("https://tululu.org/l55/", str(page_num)))
-        response.raise_for_status()
+        try:
+            response = requests.get(urljoin("https://tululu.org/l55/", str(page_num)))
+            response.raise_for_status()
 
-        for book_path in parse_book_paths(response):
-            book_url = urljoin(TULULU_BASE_URL, f'{book_path}')
-            book_id = "".join(c for c in book_path if c.isdigit())
-            try:
-                response = requests.get(book_url)
-                response.raise_for_status()
-                book_params = parse_book_page(response)
+            for book_path in parse_book_paths(response):
+                book_url = urljoin(TULULU_BASE_URL, f'{book_path}')
+                book_id = "".join(c for c in book_path if c.isdigit())
+                try:
+                    response = requests.get(book_url)
+                    response.raise_for_status()
+                    book_params = parse_book_page(response)
 
-                title = book_params["title"]
-                author = book_params["author"]
-                image_url = book_params["image_url"]
-                image_extencion = book_params["image_extension"]
-                comments = book_params["comments"]
-                genres = book_params["genres"]
+                    title = book_params["title"]
+                    author = book_params["author"]
+                    image_url = book_params["image_url"]
+                    image_extencion = book_params["image_extension"]
+                    comments = book_params["comments"]
+                    genres = book_params["genres"]
 
-                print(f"Название: {title} \nАвтор: {author}\n")
+                    print(f"Название: {title} \nАвтор: {author}\n")
 
-                if is_txt_skip:
-                    book_path = "-"
-                else:
-                    book_path = download_txt(book_id, f"{book_id}. {title}", urljoin(dest_folder, "books/"))
+                    if is_txt_skip:
+                        book_path = "-"
+                    else:
+                        book_path = download_txt(book_id, f"{book_id}. {title}", urljoin(dest_folder, "books/"))
 
-                if is_imgs_skip:
-                    image_path = "-"
-                else:
-                    image_path = download_image(image_url, f"{book_id}{image_extencion}", urljoin(dest_folder, "images/"))
+                    if is_imgs_skip:
+                        image_path = "-"
+                    else:
+                        image_path = download_image(image_url, f"{book_id}{image_extencion}", urljoin(dest_folder, "images/"))
 
-                books_params.append(
-                    {
-                        "title": title,
-                        "author": author,
-                        "img_src": image_path,
-                        "book_src": book_path,
-                        "comments": comments,
-                        "genres": genres
-                    })
-            except requests.exceptions.HTTPError:
-                logging.warning("Произошла ошибка при обработке страницы")
-            except requests.exceptions.ConnectionError:
-                logging.warning("Произошла ошибка соединения")
-                time.sleep(10)
+                    books_params.append(
+                        {
+                            "title": title,
+                            "author": author,
+                            "img_src": image_path,
+                            "book_src": book_path,
+                            "comments": comments,
+                            "genres": genres
+                        })
+                except requests.exceptions.HTTPError:
+                    logging.warning("Произошла ошибка при обработке страницы")
+                except requests.exceptions.ConnectionError:
+                    logging.warning("Произошла ошибка соединения")
+                    time.sleep(10)
+        except requests.exceptions.HTTPError:
+            logging.warning("Произошла ошибка при обработке страницы")
+        except requests.exceptions.ConnectionError:
+            logging.warning("Произошла ошибка соединения")
+            time.sleep(10)
     books_params_json = json.dumps(books_params, ensure_ascii=False)
     with open(urljoin(dest_folder, "books_params.json"), "w", encoding="utf-8") as my_file:
         my_file.write(books_params_json)
