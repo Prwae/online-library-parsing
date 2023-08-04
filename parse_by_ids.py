@@ -1,87 +1,13 @@
 import argparse
 import json
 import logging
-import os
 import time
 from urllib.parse import urljoin
 
 import requests
-from bs4 import BeautifulSoup
-from pathvalidate import sanitize_filename
 
-TULULU_BASE_URL = "https://tululu.org/"
-
-
-class ErrRedirection(Exception):
-    pass
-
-
-def check_for_redirect(response):
-    if response.url == "https://tululu.org/":
-        raise ErrRedirection
-
-
-def download_txt(book_id, filename, folder="books/"):
-    txt_url = urljoin(TULULU_BASE_URL, "txt.php")
-    payload = {
-        "id": book_id
-    }
-
-    response = requests.get(txt_url, params=payload)
-    response.raise_for_status()
-
-    book_path = f"{urljoin(folder, sanitize_filename(filename))}.txt"
-    os.makedirs(folder, exist_ok=True)
-
-    check_for_redirect(response)
-    with open(book_path, "wb") as file:
-        file.write(response.content)
-
-    return book_path
-
-
-def download_image(image_url, filename, folder="images/"):
-    response = requests.get(image_url)
-    response.raise_for_status()
-
-    image_path = f"{urljoin(folder, sanitize_filename(filename))}"
-    os.makedirs(folder, exist_ok=True)
-
-    check_for_redirect(response)
-    with open(image_path, "wb") as image:
-        image.write(response.content)
-
-    return image_path
-
-
-def parse_book_page(response):
-    soup = BeautifulSoup(response.text, "lxml")
-    title_tag = soup.find("h1")
-    image_tag = soup.find("div", class_="bookimage").find("img")["src"]
-    comments_tags = soup.find_all("div", class_="texts")
-    genre_tags = soup.find("span", class_="d_book").find_all("a")
-
-    genres = [genre_tag.text for genre_tag in genre_tags]
-
-    comments = [comment_tag.find("span").text for comment_tag in comments_tags]
-
-    image_extension = os.path.splitext(image_tag)[1]
-    image_url = urljoin(response.url, image_tag)
-
-    title_text = title_tag.text
-    title, author = title_text.strip().split("::")
-
-    book_params = {
-        "title": title.strip(),
-        "author": author.strip(),
-        "image_url": image_url,
-        "image_extension": image_extension,
-        "comments": comments,
-        "genres": genres
-    }
-
-    return book_params
-
+from general_functions import check_for_redirect, parse_book_page, download_txt, download_image, ErrRedirection, \
+    TULULU_BASE_URL
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Программа парсит книги по их ID на сайте Tululu.org")
